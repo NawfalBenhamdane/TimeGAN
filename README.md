@@ -10,26 +10,80 @@ The pipeline demonstrates the full workflow: **training, sampling, and evaluatio
 
 ---
 
-## Conceptual Intuition
+### 1. Architecture Overview
 
-Standard GANs struggle to capture **temporal dependencies** because they treat data as independent samples.  
-TimeGAN overcomes this by integrating **recurrent architectures (GRUs/LSTMs)** and an additional **supervisor network** that ensures temporal coherence within generated sequences.
+TimeGAN is composed of five cooperating neural components:
 
-TimeGAN is composed of five networks:
+1. **Embedder** – Encodes real time series into a latent representation using recurrent layers.  
+   This step captures temporal relationships and compresses information without losing dynamics.
 
-1. **Embedder** – encodes real sequences into a latent representation.
-2. **Recovery** – reconstructs sequences from the latent space (forming an autoencoder).
-3. **Generator** – produces synthetic latent trajectories from random noise.
-4. **Supervisor** – learns temporal transitions in the latent space to preserve time dependencies.
-5. **Discriminator** – distinguishes between real and synthetic latent sequences.
+2. **Recovery** – Reconstructs the original time series from the latent representation.  
+   Together, the Embedder and Recovery form an **autoencoder**, ensuring that the latent space preserves meaningful temporal structure.
 
-The training process occurs in three main stages:
+3. **Generator** – Produces synthetic latent sequences from random noise vectors.  
+   Instead of generating directly in data space, it operates in the latent domain to ensure more stable and coherent temporal evolution.
 
-1. **Autoencoder training** – ensures proper reconstruction of real data.  
-2. **Supervised training** – aligns latent dynamics via the supervisor.  
-3. **Joint adversarial training** – combines all components for final refinement and realism.
+4. **Supervisor** – Learns temporal transitions in the latent space.  
+   It predicts the next latent state given the previous ones, transferring the temporal logic of real data to the Generator.
+
+5. **Discriminator** – Distinguishes real latent sequences (from the Embedder) from fake ones (from the Generator).  
+   It acts as the adversarial feedback mechanism that guides the Generator toward realism.
 
 ---
+
+### 2. Training Philosophy
+
+The training process of TimeGAN does not rely solely on adversarial feedback.  
+Instead, it unfolds in **three coordinated phases**, each focusing on a specific learning objective:
+
+#### **Phase 1: Autoencoder Training**
+The first step focuses on training the **Embedder** and **Recovery** networks together.  
+The goal is to make sure real sequences can be faithfully reconstructed from their latent representations.  
+By minimizing the reconstruction error, this phase establishes a **meaningful latent space** that captures temporal dependencies.
+
+#### **Phase 2: Supervised Training**
+Next, the **Supervisor** network is trained to predict the next latent vector based on past ones.  
+This phase introduces a **temporal learning signal**—essentially teaching the model how time progresses.  
+It enables the Generator, later on, to create sequences that evolve realistically over time rather than random, disconnected steps.
+
+#### **Phase 3: Joint Adversarial Training**
+Finally, all networks (Generator, Supervisor, and Discriminator) are trained together in a **joint adversarial phase**.  
+The Discriminator learns to differentiate real from synthetic latent trajectories, while the Generator and Supervisor cooperate to produce sequences that both **look real** and **follow real temporal transitions**.  
+This adversarial feedback, combined with the supervised signal, stabilizes the training and ensures that generated data maintains **statistical fidelity** and **temporal realism**.
+
+---
+
+## Training Process Explanation
+
+The training pipeline was implemented step by step to mirror the theoretical design of TimeGAN while maintaining clarity in execution.
+
+1. **Autoencoder Phase**
+   - The Embedder and Recovery were optimized together using Mean Squared Error (MSE) loss.  
+   - The objective was to minimize the reconstruction gap between input data and its recovered version, establishing a reliable latent representation.
+
+2. **Supervisor Phase**
+   - The Supervisor was trained independently with a temporal MSE loss between consecutive latent states.  
+   - This stage ensures that the model learns how the hidden representations evolve through time, forming a foundation for realistic sequential generation.
+
+3. **Joint Adversarial Phase**
+   - The Generator, Supervisor, and Discriminator were optimized together.  
+   - The Generator aimed to fool the Discriminator, while the Discriminator learned to detect synthetic latent trajectories.  
+   - The Generator’s loss included additional moment-matching penalties to align the statistical moments (mean and variance) of synthetic data with real data.  
+   - During this phase, multiple updates of the Generator were performed per Discriminator step (a ratio of *k = 2*) to maintain stable adversarial learning.
+
+Throughout the process, training stability was ensured by carefully balancing losses, using gradient clipping, and applying the Adam optimizer for all networks with consistent learning rates.
+
+---
+
+## Model Insights
+
+- TimeGAN successfully blends **adversarial realism** and **temporal prediction**, allowing the Generator to learn not only what data looks like but **how it changes over time**.  
+- The Supervisor component plays a crucial role, transferring temporal knowledge from real sequences to the Generator.  
+- The use of an autoencoder ensures that both the structure and the sequential dependencies of the data are preserved in the latent space.  
+- Once trained, the model can produce entirely new, unseen sequences that mimic real-world patterns—statistically similar but temporally coherent.
+
+---
+
 
 ## Results and Evaluation
 
