@@ -38,7 +38,7 @@ The training process occurs in three main stages:
 The first set of KDE (Kernel Density Estimation) plots compares the probability density of **real** (blue) and **synthetic** (red) samples.  
 The overlap (purple) illustrates that the synthetic data closely matches the real feature distributions.
 
-![KDE Single Feature](.Pics/distribution.png)
+![KDE Single Feature](Pics/distribution.png)
 *Density overlap between real and synthetic distributions shows strong similarity.*
 
 ---
@@ -57,7 +57,7 @@ The following comparison highlights KDE distributions for two individual feature
 These scatter plots show how feature correlations (e.g., Years vs. Salary) are maintained between real and synthetic datasets.  
 While the synthetic data introduces minor variability, the underlying linear relationship remains intact.
 
-![Feature Correlation](.Pics/ex.png)
+![Feature Correlation](Pics/ex.png)
 *Correlation structure is successfully preserved between real and generated sequences.*
 
 ---
@@ -67,7 +67,7 @@ While the synthetic data introduces minor variability, the underlying linear rel
 Quantitative metrics confirm the statistical similarity between real and synthetic datasets.  
 The table below shows mean, standard deviation, and range differences, all within acceptable bounds (<10% for most metrics).
 
-![Statistical Comparison](.Pics/stats.png)
+![Statistical Comparison](Pics/stats.png)
 
 | Metric | Real Data | Synthetic Data | Difference | Relative Diff (%) |
 |---------|------------|----------------|-------------|--------------------|
@@ -85,7 +85,7 @@ The table below shows mean, standard deviation, and range differences, all withi
 To visually inspect the temporal behavior, 3D trajectory plots compare feature evolution over time.  
 Both real and synthetic sequences follow similar paths, indicating that the model successfully captures temporal structure.
 
-![3D Trajectories](.Pics/3d.png)
+![3D Trajectories](Pics/3d.png)
 *Temporal progression is well preserved; synthetic trajectories mimic real sequential dynamics.*
 
 ---
